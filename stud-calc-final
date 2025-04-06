@@ -1,0 +1,163 @@
+#include<iostream>
+#include<iomanip>
+using namespace std;
+
+class Money {
+    public:
+    double m, s, cashamount;
+    int date, month, year, endmonth, bankdep[100], n, cash, savecashh;
+    char bankyn, cashyn, cashinyn, savecash;
+    string bankname[100];
+
+    void getmoney();
+    void displaymoney();
+    void getsavings();
+    void displaysavings();
+};
+
+void Money::getmoney() {
+    cout << "Enter your money : ";
+    cin >> m;
+}
+
+void Money::displaymoney() {
+    cout << "You have " << m << " Rs. in your bank account" << endl;
+}
+
+void Money::getsavings() {
+    cout << "Enter savings for this month: ";
+    cin >> s;
+}
+
+void Money::displaysavings() {
+    cout << "The savings you want are " << s << " Rs." << endl;
+    cout << "The money you can spend in this month is " << m - s << endl;
+}
+
+class Savings : public Money {
+};
+
+class Month : public Savings {
+    public:
+    void getdate();
+    void displaydate();
+};
+
+void Month::getdate() {
+    cout << "Enter the date in (DD MM YYYY) format: "; 
+    cin >> date >> month >> year;
+    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+        endmonth = 31;
+    } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+        endmonth = 30;
+    } else if (month == 2) {
+        if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+            endmonth = 29;
+        } else {
+            endmonth = 28;
+        }
+    } else {
+        cout << "Invalid month entered!" << endl;
+    }
+}
+
+void Month::displaydate() {
+    cout << "The days left in the month are: " << endmonth - date << endl;
+    cout << "Your daily expenditure limit is: " << fixed << setprecision(2) << (m - s) / (endmonth - date) << endl;
+    cout << "Your weekly spending limit for this month is: " << fixed << setprecision(2) << (m - s) / ((endmonth - date) / 7.0) << endl;
+}
+
+class Bank : public Month {
+    public:
+    void getbank();
+    void displaybank();
+};
+
+void Bank::getbank() {
+    cout << "Do you have any money in several banks? (y/n): ";
+    cin >> bankyn;
+    if (bankyn == 'y') {
+        cout << "How many banks?: ";
+        cin >> n;
+        if (n <= 0) {
+            return;
+        }
+        for (int i = 0; i < n; i++) {
+            cout << "Enter bank " << i + 1 << " name: ";
+            cin >> bankname[i];
+            cout << "Enter amount in " << bankname[i] << ": ";
+            cin >> bankdep[i];
+        }
+    }
+}
+
+void Bank::displaybank() {
+    if (bankyn == 'y') {
+        for (int i = 0; i < n; i++) {
+            cout << bankname[i] << ": " << bankdep[i] << " Rs." << endl;
+        }
+    }
+}
+
+class Cash : public Bank {
+    public:
+    void getcash();
+    void displaycash();
+};
+
+void Cash::getcash() {
+    cout << "Do you have any money in cash? (y/n): ";
+    cin >> cashyn;
+
+    if (cashyn == 'y') {
+        cout << "Enter the amount of cash you have: ";
+        cin >> cashamount;
+
+        cout << "Is this cash already included in the money you provided earlier? (y/n): ";
+        cin >> cashinyn;
+
+        if (cashinyn == 'n') {
+            m += cashamount; 
+        }
+
+        cout << "Do you want to save just with cash? (y/n): ";
+        cin >> savecash;
+
+        if (savecash == 'y') {
+            cout << "How much cash do you want to save?: ";
+            cin >> savecashh;
+
+            if (savecashh <= cashamount) {
+                s += savecashh;  
+            } else {
+                cout << "You cannot save more than your cash amount!" << endl;
+            }
+        }
+    }
+}
+
+void Cash::displaycash() {
+    if (cashyn == 'y') {
+        cout << "Total money (including cash if not already included): " << m << " Rs." << endl;
+        cout << "Total savings (including any cash savings): " << s << " Rs." << endl;
+    }
+}
+
+int main() {
+    cout << " --------- Student Finance Calculator --------- " << endl;
+    Cash c;
+    c.getmoney();
+    c.getsavings();
+    c.getdate();
+    c.getbank();
+    c.getcash();
+
+    cout << " ---------- Total Summary of the Finances --------- " << endl;
+
+    c.displaymoney();
+    c.displaysavings();
+    c.displaydate();
+    c.displaybank();
+    c.displaycash();
+}
+
